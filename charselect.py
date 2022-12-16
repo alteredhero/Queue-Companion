@@ -2,7 +2,7 @@ import cv2 as cv
 import numpy as np
 import keyboard
 import win32gui
-
+import pyautogui
 
 class CharSelect:
 
@@ -54,11 +54,6 @@ class CharSelect:
 
         points = []
         if len(rectangles):
-
-
-
-            #passing enter keystroke
-            keyboard.press_and_release('enter')
 
 
 
