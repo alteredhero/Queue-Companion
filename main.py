@@ -1,14 +1,14 @@
 import cv2 as cv
-# from time import sleep
-# from time import time
 from windowcapture import WindowCapture
-from vision import Vision, CharSelect
+from vision import Vision, CharSelect, charSearch
 from tkinter import *
 from tkinter.ttk import *
 from pathlib import *
-# from charselect import CharSelect
 import glob
-import pyautogui
+import pyautogui as pyag
+import keyboard
+import win32gui
+import os
 
 
 
@@ -18,10 +18,7 @@ wincap = WindowCapture()
 
 # Initialize the Vision class
 vision_accept = Vision('./Resources/accept.jpg')
-
 Char_Select = CharSelect('./Resources/character_search.jpg')
-
-
 
 
 # Window parameters
@@ -37,11 +34,13 @@ selected = PhotoImage(file='./Resources/matching.png')
 unselected_bg='white'
 selected_bg='black'
 is_on = True
+search = True
+select = True
 
 
 
 # Create Portrait List pulling in image files to use as radio buttons
-image_files = glob.glob('./CharacterSelect/*.png')
+image_files = glob.glob('./CharacterIcons/*.png')
 portraits = []
 
 for file in image_files:
@@ -105,7 +104,6 @@ characters = [
                 "Nicky", 
                 "Piolo", 
                 "Priya",  
-                "Random",
                 "Rio", 
                 "Rozzi", 
                 "Shoichi", 
@@ -113,7 +111,7 @@ characters = [
                 "Sissela", 
                 "Sua", 
                 "Tazia", 
-                # "Theodore", 
+                "Theodore", 
                 "Tia",
                 # "Vanya" 
                 "William", 
@@ -129,7 +127,6 @@ def start_on():
    
    # starts autoaccept
     button.config(image = selected,
-                # bg=selected_bg,
                 command = start_off
                 )
     start()
@@ -139,11 +136,31 @@ def start_off():
     # stops autoaccept
     global is_on
     button.config(image = unselected,
-                # bg=unselected_bg,
                 command = start_on
                 )
     is_on = False
 
+def search_on():
+    # Looks for search field
+    global search
+    Char_Search()
+    search = True
+
+def search_off():
+    # Stops looking for search field
+    global search
+    search = False
+
+def charSelect_on():
+    global select
+    selection()
+    select = True
+
+def charSelect_off():
+    global select
+    select = False
+    global search
+    search = False
 
 
 # Start Object Detection for Queue Pop
@@ -154,33 +171,63 @@ def start():
 
         points = vision_accept.find(screenshot, .35, 'rectangles')
         
-        
-        # debug the loop rate
-        # print('FPS {}'.format(1 / (time() - loop_time)))
-        # loop_time = time()
+        if len(points):
+            handle = win32gui.FindWindow(0, "Eternal Return")
+            win32gui.SetForegroundWindow(handle)
 
-        # press 'q' with the output window focused to exit.
-        # waits 1 ms every loop to process key presses
-        # if cv.waitKey(1) == ord('q'):
-        #     cv.destroyAllWindows()
+            #passing enter keystroke
+            keyboard.press_and_release('enter')
+
+            start_off()
+            search_on()
 
 
     window.after(500, start)
 
 
+
 # This function searches for the character and types out the name of the character in the search field based on characters list
 def Char_Search(): 
-    if is_on:
+
+    # charVariable=0
+    # charVariable=v.get()
+
+    if search:
         screenshot = wincap.get_screenshot()
 
-        points = Char_Select.find(screenshot, .75, 'rectangles')
+        search_field = Char_Select.find(screenshot, .75, 'rectangles')
 
-    # Iterates through characters list to capture character name
-    for (i, item) in enumerate(characters, start=v):
-        print (item)
-        
-    window.after(500, Char_Search)
+        if len(search_field):
+            #Debug character selection using as label to verify character selection matches what is selected.
+            # game_selection_label.configure(text = "You have chosen: " + str(characters[charVariable]),)
+            search_off()
+            charSelect_on()
 
+
+    window.after(1000, Char_Search)
+
+
+
+def selection():
+    
+    if select:
+        # Set character name as variable in list
+        charVariable=0
+        charVariable=v.get()
+        # Type character name in search bar
+        pyag.typewrite(str(characters[charVariable]))
+
+        screenshot = wincap.get_screenshot()
+
+        # Import selection to Vision Class
+        pathtoCharacters = os.path.join(os.getcwd(), "CharacterSearch", str(characters[charVariable]+".jpg"))
+        characterSearch = charSearch(pathtoCharacters)
+        characterMatch = characterSearch.find(screenshot, .50, 'rectangles')
+
+        if len(characterMatch):
+            charSelect_off()
+    
+    window.after(1000, selection)
 
 
 ####Window and Button/Radiobutton details####
@@ -221,10 +268,7 @@ button.pack(anchor = N, side = TOP)
 
 #Stores interger values
 v = IntVar()
-
-# def selection():
-#    selected = "You selected the option " + str(v.get())
-
+v.set = ()
 
 # Radio button loops for character select
 for index in range(len(characters)):
@@ -234,7 +278,6 @@ for index in range(len(characters)):
         text = characters[index],
         variable = v,
         value = index,
-        command = Char_Search
     ).grid(
         row = index//5,
         column = index%5,
