@@ -9,6 +9,7 @@ import pyautogui as pyag
 import keyboard
 import win32gui
 import os
+from time import sleep
 
 
 
@@ -19,6 +20,8 @@ wincap = WindowCapture()
 # Initialize the Vision class
 vision_accept = Vision('./Resources/accept.jpg')
 Char_Select = CharSelect('./Resources/character_search.jpg')
+matchFound = Vision('./Resources/matchfound.jpg')
+
 
 
 # Window parameters
@@ -165,6 +168,7 @@ def charSelect_off():
 
 # Start Object Detection for Queue Pop
 def start():
+    
     if is_on:
         # get an updated image of the game
         screenshot = wincap.get_screenshot()
@@ -178,9 +182,22 @@ def start():
             #passing enter keystroke
             keyboard.press_and_release('enter')
 
-            start_off()
-            search_on()
+            # Buffer for charachter select to come up.
+            sleep(11)
 
+            # Search for onscreen confirmation that character select is up.
+            screenshot = wincap.get_screenshot()
+            matchfound = matchFound.find(screenshot, .5, 'rectangles')
+
+            # If confirmed, move on.
+            if len(matchfound):
+
+                start_off()
+                search_on()
+            
+            # If unconfirmed, start over.
+            elif():
+                start()
 
     window.after(500, start)
 
@@ -202,6 +219,7 @@ def Char_Search():
             # game_selection_label.configure(text = "You have chosen: " + str(characters[charVariable]),)
             search_off()
             charSelect_on()
+
 
 
     window.after(1000, Char_Search)

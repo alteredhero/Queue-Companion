@@ -5,6 +5,7 @@ To use:
 	1. Open app via "Main.exe"
 	3. Select character
 	2. Click "Game Start"
+	Please keep in mind that this will not select the build for you. You will end up using whatever is in your top slot.
 
 
 Future changes:
