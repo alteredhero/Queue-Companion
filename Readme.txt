@@ -5,9 +5,9 @@ The way this works is by searching for an image detection for when the queue pop
 
 To use:
 	1. Open app via "Main.exe"
-	3. Select character
-	2. Click "Game Start"
-
+	2. Select character	(It will not select your build. The top most build be defaulted)
+	3. Click "Game Start"
+	
 
 Future changes:
 	work in window.
