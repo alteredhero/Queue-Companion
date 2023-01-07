@@ -17,4 +17,8 @@ Future changes:
 Version 2.0
 
 
+<<<<<<< Updated upstream
 Please note, there might be a false positive coming from certain anti-viruses due to how the compiler i use to freeze the code. I am looking into this.
+=======
+Please note, there might be a false positive coming from certain anti-viruses due to how the compiler i use to freeze the code. I am looking into this.
+>>>>>>> Stashed changes
